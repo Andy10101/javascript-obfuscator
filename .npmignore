@@ -1,2 +1,5 @@
+.awcache
+.idea
+.nyc_output
 test/fixtures/compile-performance.js
 coverage

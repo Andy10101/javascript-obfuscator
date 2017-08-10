@@ -1,4 +1,3 @@
 #!/bin/bash
 
-$(yarn bin)/istanbul cover $(yarn bin)/_mocha -- -r ts-node/register test/index.spec.ts --report lcovonly &&
-cat ./coverage/lcov.info | $(yarn bin)/coveralls
+$(yarn bin)/nyc --reporter=text-lcov $(npm bin)/_mocha --require ts-node/register test/index.spec.ts | $(yarn bin)/coveralls

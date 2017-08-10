@@ -57,6 +57,7 @@
     "babel-loader": "7.1.1",
     "babel-plugin-array-includes": "2.0.3",
     "babel-preset-es2015": "6.24.1",
+    "babel-register": "6.24.1",
     "chai": "4.1.1",
     "coveralls": "2.13.1",
     "mocha": "3.5.0",
@@ -109,6 +110,10 @@
     "logo": "https://opencollective.com/opencollective/logo.txt"
   },
   "nyc": {
+    "require": [
+      "babel-register",
+      "ts-node/register"
+    ],
     "extension": [
       ".ts"
     ],

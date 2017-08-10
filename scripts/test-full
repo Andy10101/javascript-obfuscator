@@ -1,4 +1,4 @@
 #!/bin/bash
 
 ts-node test/dev/dev.ts &&
-$(yarn bin)/nyc --reporter=text-summary --reporter=html $(npm bin)/_mocha --require ts-node/register test/index.spec.ts
+$(yarn bin)/nyc --reporter=text-summary --reporter=html $(npm bin)/_mocha test/index.spec.ts

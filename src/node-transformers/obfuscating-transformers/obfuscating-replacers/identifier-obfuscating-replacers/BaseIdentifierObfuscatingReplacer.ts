@@ -15,12 +15,12 @@ export class BaseIdentifierObfuscatingReplacer extends AbstractObfuscatingReplac
     /**
      * @type {Map<string, string>}
      */
-    private readonly namesMap: Map<string, string> = new Map();
+    protected readonly namesMap: Map<string, string> = new Map();
 
     /**
      * @type {IRandomGenerator}
      */
-    private readonly randomGenerator: IRandomGenerator;
+    protected readonly randomGenerator: IRandomGenerator;
 
     /**
      * @param {IRandomGenerator} randomGenerator
@@ -58,16 +58,18 @@ export class BaseIdentifierObfuscatingReplacer extends AbstractObfuscatingReplac
      * @param {number} nodeIdentifier
      */
     public storeNames (nodeName: string, nodeIdentifier: number): void {
-        if (!this.isReservedName(nodeName)) {
-            this.namesMap.set(`${nodeName}-${String(nodeIdentifier)}`, this.randomGenerator.getRandomVariableName(6));
+        if (this.isReservedName(nodeName)) {
+            return;
         }
+
+        this.namesMap.set(`${nodeName}-${String(nodeIdentifier)}`, this.randomGenerator.getRandomVariableName(6));
     }
 
     /**
      * @param {string} name
      * @returns {boolean}
      */
-    private isReservedName (name: string): boolean {
+    protected isReservedName (name: string): boolean {
         return this.options.reservedNames
             .some((reservedName: string) => {
                 return new RegExp(reservedName, 'g').exec(name) !== null;

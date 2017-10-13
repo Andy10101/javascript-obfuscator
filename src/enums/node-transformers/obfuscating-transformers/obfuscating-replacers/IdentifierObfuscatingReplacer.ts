@@ -1,3 +1,4 @@
 export enum IdentifierObfuscatingReplacer {
-    BaseIdentifierObfuscatingReplacer
+    BaseIdentifierObfuscatingReplacer,
+    MangleIdentifierObfuscatingReplacer,
 }

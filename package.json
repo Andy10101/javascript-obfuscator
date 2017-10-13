@@ -24,7 +24,6 @@
     "class-validator": "0.7.2",
     "commander": "2.11.0",
     "escodegen-wallaby": "1.6.12",
-    "esmangle": "1.0.1",
     "esprima": "4.0.0",
     "estraverse": "4.2.0",
     "inversify": "4.3.0",
@@ -44,7 +43,7 @@
     "@types/escodegen": "0.0.6",
     "@types/esprima": "4.0.1",
     "@types/estraverse": "0.0.6",
-    "@types/estree": "0.0.37",
+    "@types/estree": "0.0.38",
     "@types/md5": "2.1.32",
     "@types/mkdirp": "0.5.1",
     "@types/mocha": "2.2.43",
@@ -68,8 +67,8 @@
     "tslint-eslint-rules": "4.1.1",
     "tslint-language-service": "^0.9.6",
     "tslint-webpack-plugin": "1.0.0",
-    "typescript": "2.5.3",
-    "webpack": "3.6.0",
+    "typescript": "2.6.0-rc",
+    "webpack": "3.7.1",
     "webpack-node-externals": "1.6.0"
   },
   "repository": {

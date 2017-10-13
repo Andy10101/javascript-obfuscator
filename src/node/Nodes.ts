@@ -343,13 +343,13 @@ export class Nodes {
     /**
      * @param {UnaryOperator} operator
      * @param {Expression} argument
-     * @param {boolean} prefix
+     * @param {true} prefix
      * @returns {UnaryExpression}
      */
     public static getUnaryExpressionNode (
         operator: ESTree.UnaryOperator,
         argument: ESTree.Expression,
-        prefix: boolean = true
+        prefix: true = true
     ): ESTree.UnaryExpression {
         return {
             type: NodeType.UnaryExpression,

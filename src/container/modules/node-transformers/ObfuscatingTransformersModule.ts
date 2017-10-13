@@ -18,6 +18,7 @@ import { FunctionDeclarationTransformer } from '../../../node-transformers/obfus
 import { FunctionTransformer } from '../../../node-transformers/obfuscating-transformers/FunctionTransformer';
 import { LabeledStatementTransformer } from '../../../node-transformers/obfuscating-transformers/LabeledStatementTransformer';
 import { LiteralTransformer } from '../../../node-transformers/obfuscating-transformers/LiteralTransformer';
+import { MangleIdentifierObfuscatingReplacer } from '../../../node-transformers/obfuscating-transformers/obfuscating-replacers/identifier-obfuscating-replacers/MangleIdentifierObfuscatingReplacer';
 import { NumberLiteralObfuscatingReplacer } from '../../../node-transformers/obfuscating-transformers/obfuscating-replacers/literal-obfuscating-replacers/NumberLiteralObfuscatingReplacer';
 import { ObjectExpressionTransformer } from '../../../node-transformers/obfuscating-transformers/ObjectExpressionTransformer';
 import { StringLiteralObfuscatingReplacer } from '../../../node-transformers/obfuscating-transformers/obfuscating-replacers/literal-obfuscating-replacers/StringLiteralObfuscatingReplacer';
@@ -74,6 +75,11 @@ export const obfuscatingTransformersModule: interfaces.ContainerModule = new Con
     bind<IIdentifierObfuscatingReplacer>(ServiceIdentifiers.IIdentifierObfuscatingReplacer)
         .to(BaseIdentifierObfuscatingReplacer)
         .whenTargetNamed(IdentifierObfuscatingReplacer.BaseIdentifierObfuscatingReplacer);
+
+    bind<IIdentifierObfuscatingReplacer>(ServiceIdentifiers.IIdentifierObfuscatingReplacer)
+        .to(MangleIdentifierObfuscatingReplacer)
+        .inSingletonScope()
+        .whenTargetNamed(IdentifierObfuscatingReplacer.MangleIdentifierObfuscatingReplacer);
 
     // literal obfuscating replacer factory
     bind<IObfuscatingReplacer>(ServiceIdentifiers.Factory__IObfuscatingReplacer)

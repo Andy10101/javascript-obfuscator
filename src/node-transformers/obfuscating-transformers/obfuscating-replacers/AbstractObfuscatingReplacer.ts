@@ -23,9 +23,10 @@ export abstract class AbstractObfuscatingReplacer implements IObfuscatingReplace
     }
 
     /**
-     * @param {any} nodeValue
+     * @param nodeValue
      * @param {number} nodeIdentifier
+     * @param {Node} scopeNode
      * @returns {Node}
      */
-    public abstract replace (nodeValue: any, nodeIdentifier?: number): ESTree.Node;
+    public abstract replace (nodeValue: any, nodeIdentifier?: number, scopeNode?: ESTree.Node): ESTree.Node;
 }

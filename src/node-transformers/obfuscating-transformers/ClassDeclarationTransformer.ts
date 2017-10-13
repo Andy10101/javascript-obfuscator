@@ -63,8 +63,8 @@ export class ClassDeclarationTransformer extends AbstractNodeTransformer {
      */
     public getVisitor (): IVisitor {
         return {
-            enter: (node: ESTree.Node, parentNode: ESTree.Node) => {
-                if (NodeGuards.isClassDeclarationNode(node)) {
+            enter: (node: ESTree.Node, parentNode: ESTree.Node | null) => {
+                if (parentNode && NodeGuards.isClassDeclarationNode(node)) {
                     return this.transformNode(node, parentNode);
                 }
             }
@@ -78,20 +78,20 @@ export class ClassDeclarationTransformer extends AbstractNodeTransformer {
      */
     public transformNode (classDeclarationNode: ESTree.ClassDeclaration, parentNode: ESTree.Node): ESTree.Node {
         const nodeIdentifier: number = this.nodeIdentifier++;
-        const blockScopeOfClassDeclarationNode: TNodeWithBlockStatement = NodeUtils
+        const scopeNode: TNodeWithBlockStatement = NodeUtils
             .getBlockScopesOfNode(classDeclarationNode)[0];
 
-        if (!this.options.renameGlobals && blockScopeOfClassDeclarationNode.type === NodeType.Program) {
+        if (!this.options.renameGlobals && scopeNode.type === NodeType.Program) {
             return classDeclarationNode;
         }
 
         this.storeClassName(classDeclarationNode, nodeIdentifier);
 
         // check for cached identifiers for current scope node. If exist - loop through them.
-        if (this.replaceableIdentifiers.has(blockScopeOfClassDeclarationNode)) {
-            this.replaceScopeCachedIdentifiers(blockScopeOfClassDeclarationNode, nodeIdentifier);
+        if (this.replaceableIdentifiers.has(scopeNode)) {
+            this.replaceScopeCachedIdentifiers(scopeNode, nodeIdentifier);
         } else {
-            this.replaceScopeIdentifiers(blockScopeOfClassDeclarationNode, nodeIdentifier);
+            this.replaceScopeIdentifiers(scopeNode, nodeIdentifier);
         }
 
         return classDeclarationNode;
@@ -106,30 +106,32 @@ export class ClassDeclarationTransformer extends AbstractNodeTransformer {
     }
 
     /**
-     * @param {NodeGuards} scopeNode
+     * @param {TNodeWithBlockStatement} scopeNode
      * @param {number} nodeIdentifier
      */
-    private replaceScopeCachedIdentifiers (scopeNode: ESTree.Node, nodeIdentifier: number): void {
+    private replaceScopeCachedIdentifiers (scopeNode: TNodeWithBlockStatement, nodeIdentifier: number): void {
         const cachedReplaceableIdentifiers: ESTree.Identifier[] = <ESTree.Identifier[]>this.replaceableIdentifiers.get(scopeNode);
 
         cachedReplaceableIdentifiers.forEach((replaceableIdentifier: ESTree.Identifier) => {
-            const newReplaceableIdentifier: ESTree.Identifier = this.identifierObfuscatingReplacer.replace(replaceableIdentifier.name, nodeIdentifier);
+            const newReplaceableIdentifier: ESTree.Identifier = this.identifierObfuscatingReplacer
+                .replace(replaceableIdentifier.name, nodeIdentifier);
 
             replaceableIdentifier.name = newReplaceableIdentifier.name;
         });
     }
 
     /**
-     * @param {NodeGuards} scopeNode
+     * @param {TNodeWithBlockStatement} scopeNode
      * @param {number} nodeIdentifier
      */
-    private replaceScopeIdentifiers (scopeNode: ESTree.Node, nodeIdentifier: number): void {
+    private replaceScopeIdentifiers (scopeNode: TNodeWithBlockStatement, nodeIdentifier: number): void {
         const storedReplaceableIdentifiers: ESTree.Identifier[] = [];
 
         estraverse.replace(scopeNode, {
-            enter: (node: ESTree.Node, parentNode: ESTree.Node): any => {
-                if (NodeGuards.isReplaceableIdentifierNode(node, parentNode)) {
-                    const newIdentifier: ESTree.Identifier = this.identifierObfuscatingReplacer.replace(node.name, nodeIdentifier);
+            enter: (node: ESTree.Node, parentNode: ESTree.Node | null): any => {
+                if (parentNode && NodeGuards.isReplaceableIdentifierNode(node, parentNode)) {
+                    const newIdentifier: ESTree.Identifier = this.identifierObfuscatingReplacer
+                        .replace(node.name, nodeIdentifier);
                     const newIdentifierName: string = newIdentifier.name;
 
                     if (node.name !== newIdentifierName) {

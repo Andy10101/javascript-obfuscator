@@ -6,37 +6,26 @@ import { NO_CUSTOM_NODES_PRESET } from '../../src/options/presets/NoCustomNodes'
 
     let obfuscatedCode: string = JavaScriptObfuscator.obfuscate(
         `
-        (function(){
-            if (true) {
-                var foo = function () {
-                    console.log('abc');
-                };
-                var bar = function () {
-                    console.log('def');
-                };
-                var baz = function () {
-                    console.log('ghi');
-                };
-                var bark = function () {
-                    console.log('jkl');
-                };
-                var hawk = function () {
-                    console.log('mno');
-                };
+        (function () {
+            var CompilerConfig = (function () {
+                function CompilerConfig(_a) {
+                    var _b = _a === void 0 ? {} : _a, _c = _b.renderTypes, renderTypes = _c === void 0 ? new DefaultRenderTypes() : _c;
+                }
+                return CompilerConfig;
+            }());
+            var DefaultRenderTypes = (function () {
+                function DefaultRenderTypes() {
+                }
+                return DefaultRenderTypes;
+            }());
             
-                foo();
-                bar();
-                baz();
-                bark();
-                hawk();
-            }
+            console.log(new CompilerConfig());
         })();
         `,
         {
             ...NO_CUSTOM_NODES_PRESET,
             compact: false,
-            deadCodeInjection: true,
-            deadCodeInjectionThreshold: 1
+            mangle: true
         }
     ).getObfuscatedCode();
 

@@ -6,14 +6,51 @@ import { IDeclarationIdentifiersDetector } from '../../../interfaces/analyzers/b
 import { NodeGuards } from '../../../node/NodeGuards';
 
 @injectable()
-export class VariableDeclarationIdentifiersDetector implements IDeclarationIdentifiersDetector {
-    public detect (node: ESTree.Node): ESTree.Identifier[] {
-        const declarationIdentifiers: ESTree.Identifier[] = [];
+export abstract class AbstractDeclarationIdentifiersDetector implements IDeclarationIdentifiersDetector {
+    /**
+     * @type {Map<ESTree.Node, ESTree.Identifier[]>}
+     */
+    protected declarationIdentifiersCache: Map <ESTree.Node, ESTree.Identifier[]> = new Map();
 
-        if (NodeGuards.isVariableDeclaratorNode(node)) {
-            declarationIdentifiers = BlockScopeAnalyzer.getPatternNodeIdentifiers(node.id);
+    /**
+     * @param {Pattern} patternNode
+     * @returns {Identifier[]}
+     */
+    protected static getPatternNodeIdentifiers (patternNode: ESTree.Pattern): ESTree.Identifier[] {
+        if (NodeGuards.isIdentifierNode(patternNode)) {
+            return [patternNode];
         }
 
-        return declarationIdentifiers;
+        if (NodeGuards.isAssignmentPatternNode(patternNode)) {
+            return AbstractDeclarationIdentifiersDetector.getPatternNodeIdentifiers(patternNode.left);
+        }
+
+        if (NodeGuards.isRestElementNode(patternNode) && NodeGuards.isIdentifierNode(patternNode.argument)) {
+            return AbstractDeclarationIdentifiersDetector.getPatternNodeIdentifiers(patternNode.argument);
+        }
+
+        if (NodeGuards.isArrayPatternNode(patternNode)) {
+            return patternNode.elements
+                .reduce((identifiers: ESTree.Identifier[], element: ESTree.Pattern) => [
+                    ...identifiers,
+                    ...AbstractDeclarationIdentifiersDetector.getPatternNodeIdentifiers(element)
+                ], []);
+        }
+
+        if (NodeGuards.isObjectPatternNode(patternNode)) {
+            return patternNode.properties
+                .reduce((identifiers: ESTree.Identifier[], property: ESTree.AssignmentProperty) => [
+                    ...identifiers,
+                    ...AbstractDeclarationIdentifiersDetector.getPatternNodeIdentifiers(property.value)
+                ], []);
+        }
+
+        return [];
     }
+
+    /**
+     * @param {Node} node
+     * @returns {Identifier[]}
+     */
+    public abstract detect (node: ESTree.Node): ESTree.Identifier[];
 }

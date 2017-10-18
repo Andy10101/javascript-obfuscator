@@ -1,12 +1,12 @@
 import * as ESTree from 'estree';
 
 import { IAnalyzer } from '../IAnalyzer';
-import { IScopeData } from './IScopeData';
+import { IBlockScopeData } from './IBlockScopeData';
 
-export interface IScopeAnalyzer extends IAnalyzer {
+export interface IBlockScopeAnalyzer extends IAnalyzer {
     /**
-     * @param {Program} astTree
-     * @returns {IScopeData[]}
+     * @param {Node} node
+     * @returns {IBlockScopeData[]}
      */
-    analyze (astTree: ESTree.Program): IScopeData[];
+    analyze (node: ESTree.Node): IBlockScopeData[];
 }

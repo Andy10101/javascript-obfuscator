@@ -36,33 +36,39 @@ export class BaseIdentifierObfuscatingReplacer extends AbstractObfuscatingReplac
     }
 
     /**
-     * @param {string} nodeValue
+     * @param {Identifier} node
      * @param {number} nodeIdentifier
      * @returns {Identifier}
      */
-    public replace (nodeValue: string, nodeIdentifier: number): ESTree.Identifier {
-        const mapKey: string = `${nodeValue}-${String(nodeIdentifier)}`;
+    public replace (node: ESTree.Identifier, nodeIdentifier: number): ESTree.Identifier {
+        const identifierName: string = node.name;
+        const mapKey: string = `${identifierName}-${String(nodeIdentifier)}`;
 
-        if (this.namesMap.has(mapKey)) {
-            nodeValue = <string>this.namesMap.get(mapKey);
-        }
+        const newIdentifierName: string = this.namesMap.has(mapKey)
+            ? <string>this.namesMap.get(mapKey)
+            : identifierName;
 
-        return Nodes.getIdentifierNode(nodeValue);
+        return Nodes.getIdentifierNode(newIdentifierName);
     }
 
     /**
      * Store all `nodeIdentifier`'s as keys in given `namesMap` with random names as value.
      * Reserved names will be ignored.
      *
-     * @param {string} nodeName
+     * @param {Identifier} node
      * @param {number} nodeIdentifier
      */
-    public storeNames (nodeName: string, nodeIdentifier: number): void {
-        if (this.isReservedName(nodeName)) {
+    public storeNames (node: ESTree.Identifier, nodeIdentifier: number): void {
+        const identifierName: string = node.name;
+
+        if (this.isReservedName(identifierName)) {
             return;
         }
 
-        this.namesMap.set(`${nodeName}-${String(nodeIdentifier)}`, this.randomGenerator.getRandomVariableName(6));
+        this.namesMap.set(
+            `${identifierName}-${String(nodeIdentifier)}`,
+            this.randomGenerator.getRandomVariableName(6)
+        );
     }
 
     /**

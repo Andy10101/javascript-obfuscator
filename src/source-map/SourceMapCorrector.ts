@@ -1,7 +1,7 @@
 import { injectable, inject } from 'inversify';
 import { ServiceIdentifiers } from '../container/ServiceIdentifiers';
 
-import { TObfuscationResultFactory } from '../types/container/TObfuscationResultFactory';
+import { TObfuscationResultFactory } from '../types/TObfuscationResultFactory';
 
 import { ICryptUtils } from '../interfaces/utils/ICryptUtils';
 import { IObfuscationResult } from '../interfaces/IObfuscationResult';

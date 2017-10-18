@@ -63,13 +63,6 @@ export class JavaScriptObfuscator implements IJavaScriptObfuscator {
      * @type {NodeTransformer[]}
      */
     private static readonly obfuscatingTransformersList: NodeTransformer[] = [
-        NodeTransformer.CatchClauseTransformer,
-        NodeTransformer.ClassDeclarationTransformer,
-        NodeTransformer.FunctionDeclarationTransformer,
-        NodeTransformer.FunctionTransformer,
-        NodeTransformer.LabeledStatementTransformer,
-        NodeTransformer.LiteralTransformer,
-        NodeTransformer.ObjectExpressionTransformer,
         NodeTransformer.VariableDeclarationTransformer
     ];
 

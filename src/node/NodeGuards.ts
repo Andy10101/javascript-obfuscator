@@ -3,8 +3,17 @@ import * as ESTree from 'estree';
 import { TNodeWithBlockStatement } from '../types/node/TNodeWithBlockStatement';
 
 import { NodeType } from '../enums/node/NodeType';
+import { NodeUtils } from './NodeUtils';
 
 export class NodeGuards {
+    /**
+     * @param {Node} node
+     * @returns {boolean}
+     */
+    public static isArrayPatternNode (node: ESTree.Node): node is ESTree.ArrayPattern {
+        return node.type === NodeType.ArrayPattern;
+    }
+
     /**
      * @param {Node} node
      * @returns {boolean}
@@ -19,6 +28,16 @@ export class NodeGuards {
      */
     public static isAssignmentPatternNode (node: ESTree.Node): node is ESTree.AssignmentPattern {
         return node.type === NodeType.AssignmentPattern;
+    }
+
+    /**
+     * @param {Node} node
+     * @returns {boolean}
+     */
+    public static isBlockScopeNode (node: ESTree.Node): node is TNodeWithBlockStatement {
+        return NodeGuards.isNodeHasBlockStatement(node)
+            && !!node.parentNode
+            && NodeUtils.nodesWithBlockScope.includes(node.parentNode.type);
     }
 
     /**
@@ -222,6 +241,14 @@ export class NodeGuards {
         );
 
         return !parentNodeIsPropertyNode && !parentNodeIsMemberExpressionNode && !NodeGuards.isLabelIdentifierNode(node, parentNode);
+    }
+
+    /**
+     * @param {Node} node
+     * @returns {boolean}
+     */
+    public static isRestElementNode (node: ESTree.Node): node is ESTree.RestElement {
+        return node.type === NodeType.RestElement;
     }
 
     /**

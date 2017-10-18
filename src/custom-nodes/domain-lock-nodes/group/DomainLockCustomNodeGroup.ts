@@ -1,7 +1,7 @@
 import { injectable, inject } from 'inversify';
 import { ServiceIdentifiers } from '../../../container/ServiceIdentifiers';
 
-import { TCustomNodeFactory } from '../../../types/container/custom-nodes/TCustomNodeFactory';
+import { TCustomNodeFactory } from '../../../types/custom-nodes/TCustomNodeFactory';
 import { TNodeWithBlockStatement } from '../../../types/node/TNodeWithBlockStatement';
 
 import { ICustomNode } from '../../../interfaces/custom-nodes/ICustomNode';

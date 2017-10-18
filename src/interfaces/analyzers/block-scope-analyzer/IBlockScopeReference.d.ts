@@ -1,5 +1,12 @@
 import * as ESTree from 'estree';
 
-export interface IBlockScopeDefinition {
+import { TNodeWithBlockStatement } from '../../../types/node/TNodeWithBlockStatement';
 
+import { IBlockScopeVariableData } from './IBlockScopeVariableData';
+
+export interface IBlockScopeReference {
+    identifier: ESTree.Identifier;
+    from: TNodeWithBlockStatement;
+    resolved: IBlockScopeVariableData | null;
+    init: boolean;
 }

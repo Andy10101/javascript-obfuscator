@@ -1,6 +1,9 @@
 import * as ESTree from 'estree';
 
-export interface IBlockScopeBlockData {
-    type: string;
-    body: ESTree.Node[];
+import { IBlockScopeReference } from './IBlockScopeReference';
+
+export interface IBlockScopeVariableData {
+    name: ESTree.Identifier;
+    definitions: ESTree.Identifier[];
+    references: IBlockScopeReference[];
 }

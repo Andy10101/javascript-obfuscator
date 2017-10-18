@@ -4,7 +4,7 @@ import { ServiceIdentifiers } from '../../container/ServiceIdentifiers';
 import * as estraverse from 'estraverse';
 import * as ESTree from 'estree';
 
-import { TIdentifierObfuscatingReplacerFactory } from '../../types/container/node-transformers/TIdentifierObfuscatingReplacerFactory';
+import { TIdentifierObfuscatingReplacerFactory } from '../../types/node-transformers/TIdentifierObfuscatingReplacerFactory';
 
 import { IIdentifierObfuscatingReplacer } from '../../interfaces/node-transformers/obfuscating-transformers/obfuscating-replacers/IIdentifierObfuscatingReplacer';
 import { IOptions } from '../../interfaces/options/IOptions';
@@ -96,13 +96,13 @@ export class FunctionTransformer extends AbstractNodeTransformer {
                 estraverse.traverse(paramsNode, {
                     enter: (node: ESTree.Node): any => {
                         if (NodeGuards.isAssignmentPatternNode(node) && NodeGuards.isIdentifierNode(node.left)) {
-                            this.identifierObfuscatingReplacer.storeNames(node.left.name, nodeIdentifier);
+                            this.identifierObfuscatingReplacer.storeNames(node.left, nodeIdentifier);
 
                             return estraverse.VisitorOption.Skip;
                         }
 
                         if (NodeGuards.isIdentifierNode(node)) {
-                            this.identifierObfuscatingReplacer.storeNames(node.name, nodeIdentifier);
+                            this.identifierObfuscatingReplacer.storeNames(node, nodeIdentifier);
                         }
                     }
                 });
@@ -117,7 +117,7 @@ export class FunctionTransformer extends AbstractNodeTransformer {
         const replaceVisitor: estraverse.Visitor = {
             enter: (node: ESTree.Node, parentNode: ESTree.Node | null): any => {
                 if (parentNode && NodeGuards.isReplaceableIdentifierNode(node, parentNode)) {
-                    const newIdentifier: ESTree.Identifier = this.identifierObfuscatingReplacer.replace(node.name, nodeIdentifier);
+                    const newIdentifier: ESTree.Identifier = this.identifierObfuscatingReplacer.replace(node, nodeIdentifier);
                     const newIdentifierName: string = newIdentifier.name;
 
                     if (node.name !== newIdentifierName) {

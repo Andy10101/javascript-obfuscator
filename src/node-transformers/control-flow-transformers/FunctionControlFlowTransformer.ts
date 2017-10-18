@@ -4,9 +4,9 @@ import { ServiceIdentifiers } from '../../container/ServiceIdentifiers';
 import * as estraverse from 'estraverse';
 import * as ESTree from 'estree';
 
-import { TControlFlowCustomNodeFactory } from '../../types/container/custom-nodes/TControlFlowCustomNodeFactory';
-import { TControlFlowReplacerFactory } from '../../types/container/node-transformers/TControlFlowReplacerFactory';
-import { TControlFlowStorageFactory } from '../../types/container/node-transformers/TControlFlowStorageFactory';
+import { TControlFlowCustomNodeFactory } from '../../types/custom-nodes/TControlFlowCustomNodeFactory';
+import { TControlFlowReplacerFactory } from '../../types/node-transformers/TControlFlowReplacerFactory';
+import { TControlFlowStorageFactory } from '../../types/node-transformers/TControlFlowStorageFactory';
 import { TNodeWithBlockStatement } from '../../types/node/TNodeWithBlockStatement';
 
 import { ICustomNode } from '../../interfaces/custom-nodes/ICustomNode';

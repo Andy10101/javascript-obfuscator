@@ -4,7 +4,7 @@ import { ServiceIdentifiers } from '../../container/ServiceIdentifiers';
 import * as estraverse from 'estraverse';
 import * as ESTree from 'estree';
 
-import { TCalleeDataExtractorFactory } from '../../types/container/stack-trace-analyzer/TCalleeDataExtractorFactory';
+import { TCalleeDataExtractorFactory } from '../../types/analyzers/stack-trace-analyzer/TCalleeDataExtractorFactory';
 
 import { ICalleeData } from '../../interfaces/analyzers/stack-trace-analyzer/ICalleeData';
 import { IStackTraceAnalyzer } from '../../interfaces/analyzers/stack-trace-analyzer/IStackTraceAnalyzer';

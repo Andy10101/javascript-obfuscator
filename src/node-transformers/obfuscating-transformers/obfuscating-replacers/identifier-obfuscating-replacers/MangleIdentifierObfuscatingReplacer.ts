@@ -1,6 +1,7 @@
 import { injectable, inject } from 'inversify';
 import { ServiceIdentifiers } from '../../../../container/ServiceIdentifiers';
 
+import * as estraverse from 'estraverse';
 import * as ESTree from 'estree';
 
 import { IOptions } from '../../../../interfaces/options/IOptions';
@@ -8,6 +9,8 @@ import { IRandomGenerator } from '../../../../interfaces/utils/IRandomGenerator'
 
 import { BaseIdentifierObfuscatingReplacer } from './BaseIdentifierObfuscatingReplacer';
 import { Nodes } from '../../../../node/Nodes';
+import { NodeUtils } from '../../../../node/NodeUtils';
+import { NodeGuards } from '../../../../node/NodeGuards';
 
 @injectable()
 export class MangleIdentifierObfuscatingReplacer extends BaseIdentifierObfuscatingReplacer {
@@ -22,9 +25,14 @@ export class MangleIdentifierObfuscatingReplacer extends BaseIdentifierObfuscati
     private static NameSequence: string[] = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_$'.split('');
 
     /**
+     * @type {Set<Identifier>}
+     */
+    private renamedIdentifiersSet: Set <ESTree.Identifier> = new Set();
+
+    /**
      * @type {Map<ESTree.Node, string>}
      */
-    // private scopeNodeNamesMap: Map <ESTree.Node, string> = new Map();
+    private scopeNodeNamesMap: Map <ESTree.Node, string> = new Map();
 
     /**
      * @param {IRandomGenerator} randomGenerator
@@ -51,7 +59,7 @@ export class MangleIdentifierObfuscatingReplacer extends BaseIdentifierObfuscati
      * @param {string} name
      * @returns {string}
      */
-    private static getNewName (name: string): string {
+    private static generateNewName (name: string): string {
         const NameSequence: string[] = MangleIdentifierObfuscatingReplacer.NameSequence;
         const ZeroSequenceCache: string[] = [];
 
@@ -88,46 +96,85 @@ export class MangleIdentifierObfuscatingReplacer extends BaseIdentifierObfuscati
     }
 
     /**
-     * @param {string} nodeValue
+     * @param {Identifier} node
      * @param {number} nodeIdentifier
      * @returns {Identifier}
      */
-    public replace (nodeValue: string, nodeIdentifier: number): ESTree.Identifier {
-        const mapKey: string = `${nodeValue}-${String(nodeIdentifier)}`;
+    public replace (node: ESTree.Identifier, nodeIdentifier: number): ESTree.Identifier {
+        const identifierName: string = node.name;
+        const scopeNode: ESTree.Node = NodeUtils.getBlockScopesOfNode(node)[0];
+        const mapKey: string = `${identifierName}-${String(nodeIdentifier)}`;
+
+        let newIdentifierName: string;
 
         if (this.namesMap.has(mapKey)) {
-            nodeValue = <string>this.namesMap.get(mapKey);
+            newIdentifierName = <string>this.namesMap.get(mapKey);
 
             const previousNameWeight: number = MangleIdentifierObfuscatingReplacer.getNameWeight(
-                /*<string>this.scopeNodeNamesMap.get(scopeNode) || */''
+                <string>this.scopeNodeNamesMap.get(scopeNode) || ''
             );
-            const currentNameWeight: number = MangleIdentifierObfuscatingReplacer.getNameWeight(nodeValue);
+            const currentNameWeight: number = MangleIdentifierObfuscatingReplacer.getNameWeight(newIdentifierName);
 
-            if (currentNameWeight > previousNameWeight) {
-                // this.scopeNodeNamesMap.set(scopeNode, nodeValue);
+            if (currentNameWeight >= previousNameWeight) {
+                this.scopeNodeNamesMap.set(scopeNode, newIdentifierName);
             }
+
+            this.renamedIdentifiersSet.add(node);
+        } else {
+            newIdentifierName = identifierName;
         }
 
-        return Nodes.getIdentifierNode(nodeValue);
+        return Nodes.getIdentifierNode(newIdentifierName);
     }
 
     /**
      * Store all `nodeIdentifier`'s as keys in given `namesMap` with random names as value.
      * Reserved names will be ignored.
      *
-     * @param {string} nodeName
+     * @param {Identifier} node
      * @param {number} nodeIdentifier
      */
-    public storeNames (nodeName: string, nodeIdentifier: number): void {
-        if (this.isReservedName(nodeName)) {
+    public storeNames (node: ESTree.Identifier, nodeIdentifier: number): void {
+        const identifierName: string = node.name;
+        const scopeNode: ESTree.Node = NodeUtils.getBlockScopesOfNode(node)[0];
+
+        if (this.isReservedName(identifierName) || this.renamedIdentifiersSet.has(node)) {
             return;
         }
 
-        const mapKey: string = `${nodeName}-${String(nodeIdentifier)}`;
-        const baseName: string = /*this.scopeNodeNamesMap.get(scopeNode) ||*/ MangleIdentifierObfuscatingReplacer.initNameCharacter;
-        const newName: string = MangleIdentifierObfuscatingReplacer.getNewName(baseName);
+        const mapKey: string = `${identifierName}-${String(nodeIdentifier)}`;
+        const newName: string = this.getNewName(scopeNode, node);
 
         this.namesMap.set(mapKey, newName);
-        // this.scopeNodeNamesMap.set(scopeNode, newName);
+        this.scopeNodeNamesMap.set(scopeNode, newName);
+    }
+
+    /**
+     * @param {Node} scopeNode
+     * @param {Identifier} identifier
+     * @returns {string}
+     */
+    private getNewName (scopeNode: ESTree.Node, identifier: ESTree.Identifier): string {
+        const identifierName: string = identifier.name;
+
+        let baseName: string = this.scopeNodeNamesMap.get(scopeNode) || MangleIdentifierObfuscatingReplacer.initNameCharacter;
+
+        estraverse.traverse(scopeNode, {
+            enter: (node: ESTree.Node): any => {
+                if (NodeGuards.isIdentifierNode(node) && node !== identifier && node.name === identifierName) {
+                    const referenceIdentifierScopeNode: ESTree.Node = NodeUtils.getBlockScopesOfNode(node)[0];
+                    const correctedBaseName: string = <string>this.scopeNodeNamesMap.get(referenceIdentifierScopeNode) || MangleIdentifierObfuscatingReplacer.initNameCharacter;
+
+                    const baseNameWeight: number = MangleIdentifierObfuscatingReplacer.getNameWeight(baseName);
+                    const correctedBaseNameWeight: number = MangleIdentifierObfuscatingReplacer.getNameWeight(correctedBaseName);
+
+                    if (correctedBaseNameWeight >= baseNameWeight) {
+                        baseName = correctedBaseName;
+                    }
+                }
+            }
+        });
+
+        return MangleIdentifierObfuscatingReplacer.generateNewName(baseName);
     }
 }

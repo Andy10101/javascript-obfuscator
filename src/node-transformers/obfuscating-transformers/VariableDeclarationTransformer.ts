@@ -4,9 +4,12 @@ import { ServiceIdentifiers } from '../../container/ServiceIdentifiers';
 import * as estraverse from 'estraverse';
 import * as ESTree from 'estree';
 
-import { TIdentifierObfuscatingReplacerFactory } from '../../types/container/node-transformers/TIdentifierObfuscatingReplacerFactory';
+const util: any = require('util');
+
+import { TIdentifierObfuscatingReplacerFactory } from '../../types/node-transformers/TIdentifierObfuscatingReplacerFactory';
 import { TNodeWithBlockStatement } from '../../types/node/TNodeWithBlockStatement';
 
+import { IBlockScopeAnalyzer } from '../../interfaces/analyzers/block-scope-analyzer/IBlockScopeAnalyzer';
 import { IIdentifierObfuscatingReplacer } from '../../interfaces/node-transformers/obfuscating-transformers/obfuscating-replacers/IIdentifierObfuscatingReplacer';
 import { IOptions } from '../../interfaces/options/IOptions';
 import { IRandomGenerator } from '../../interfaces/utils/IRandomGenerator';
@@ -32,6 +35,11 @@ import { NodeUtils } from '../../node/NodeUtils';
 @injectable()
 export class VariableDeclarationTransformer extends AbstractNodeTransformer {
     /**
+     * @type {IBlockScopeAnalyzer}
+     */
+    private readonly blockScopeAnalyzer: IBlockScopeAnalyzer;
+
+    /**
      * @type {IIdentifierObfuscatingReplacer}
      */
     private readonly identifierObfuscatingReplacer: IIdentifierObfuscatingReplacer;
@@ -43,16 +51,20 @@ export class VariableDeclarationTransformer extends AbstractNodeTransformer {
 
     /**
      * @param {TIdentifierObfuscatingReplacerFactory} identifierObfuscatingReplacerFactory
+     * @param blockScopeAnalyzer
      * @param {IRandomGenerator} randomGenerator
      * @param {IOptions} options
      */
     constructor (
         @inject(ServiceIdentifiers.Factory__IIdentifierObfuscatingReplacer)
             identifierObfuscatingReplacerFactory: TIdentifierObfuscatingReplacerFactory,
+        @inject(ServiceIdentifiers.IBlockScopeAnalyzer) blockScopeAnalyzer: IBlockScopeAnalyzer,
         @inject(ServiceIdentifiers.IRandomGenerator) randomGenerator: IRandomGenerator,
         @inject(ServiceIdentifiers.IOptions) options: IOptions
     ) {
         super(randomGenerator, options);
+
+        this.blockScopeAnalyzer = blockScopeAnalyzer;
 
         const identifierObfuscatingReplacer: IdentifierObfuscatingReplacer = !this.options.mangle
             ? IdentifierObfuscatingReplacer.BaseIdentifierObfuscatingReplacer
@@ -82,6 +94,8 @@ export class VariableDeclarationTransformer extends AbstractNodeTransformer {
     public transformNode (variableDeclarationNode: ESTree.VariableDeclaration, parentNode: ESTree.Node): ESTree.Node {
         const blockScopeOfVariableDeclarationNode: TNodeWithBlockStatement = NodeUtils
             .getBlockScopesOfNode(variableDeclarationNode)[0];
+
+        console.log(util.inspect(this.blockScopeAnalyzer.analyze(variableDeclarationNode), { showHidden: false, depth: 4 }));
 
         if (!this.options.renameGlobals && blockScopeOfVariableDeclarationNode.type === NodeType.Program) {
             return variableDeclarationNode;
@@ -118,7 +132,7 @@ export class VariableDeclarationTransformer extends AbstractNodeTransformer {
                 estraverse.traverse(declarationNode.id, {
                     enter: (node: ESTree.Node) => {
                         if (NodeGuards.isIdentifierNode(node)) {
-                            this.identifierObfuscatingReplacer.storeNames(node.name, nodeIdentifier);
+                            this.identifierObfuscatingReplacer.storeNames(node, nodeIdentifier);
                         }
                     }
                 });
@@ -133,8 +147,7 @@ export class VariableDeclarationTransformer extends AbstractNodeTransformer {
         const cachedReplaceableIdentifiers: ESTree.Identifier[] = <ESTree.Identifier[]>this.replaceableIdentifiers.get(scopeNode);
 
         cachedReplaceableIdentifiers.forEach((replaceableIdentifier: ESTree.Identifier) => {
-            const newReplaceableIdentifier: ESTree.Identifier = this.identifierObfuscatingReplacer
-                .replace(replaceableIdentifier.name, nodeIdentifier);
+            const newReplaceableIdentifier: ESTree.Identifier = this.identifierObfuscatingReplacer.replace(replaceableIdentifier, nodeIdentifier);
 
             replaceableIdentifier.name = newReplaceableIdentifier.name;
         });
@@ -150,7 +163,7 @@ export class VariableDeclarationTransformer extends AbstractNodeTransformer {
         estraverse.replace(scopeNode, {
             enter: (node: ESTree.Node, parentNode: ESTree.Node | null): any => {
                 if (parentNode && !node.obfuscatedNode && NodeGuards.isReplaceableIdentifierNode(node, parentNode)) {
-                    const newIdentifier: ESTree.Identifier = this.identifierObfuscatingReplacer.replace(node.name, nodeIdentifier);
+                    const newIdentifier: ESTree.Identifier = this.identifierObfuscatingReplacer.replace(node, nodeIdentifier);
                     const newIdentifierName: string = newIdentifier.name;
 
                     if (node.name !== newIdentifierName) {

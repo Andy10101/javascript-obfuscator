@@ -4,8 +4,8 @@ import { IObfuscatingReplacer } from './IObfuscatingReplacer';
 
 export interface IIdentifierObfuscatingReplacer extends IObfuscatingReplacer <ESTree.Identifier> {
     /**
-     * @param nodeValue
+     * @param {Identifier} node
      * @param {number} nodeIdentifier
      */
-    storeNames (nodeValue: any, nodeIdentifier: number): void;
+    storeNames (node: ESTree.Identifier, nodeIdentifier: number): void;
 }

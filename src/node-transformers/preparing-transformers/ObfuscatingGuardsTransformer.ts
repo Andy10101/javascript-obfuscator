@@ -3,7 +3,7 @@ import { ServiceIdentifiers } from '../../container/ServiceIdentifiers';
 
 import * as ESTree from 'estree';
 
-import { TObfuscatingGuardFactory } from '../../types/container/node-transformers/TObfuscatingGuardFactory';
+import { TObfuscatingGuardFactory } from '../../types/node-transformers/TObfuscatingGuardFactory';
 
 import { IObfuscatingGuard } from '../../interfaces/node-transformers/preparing-transformers/obfuscating-guards/IObfuscatingGuard';
 import { IOptions } from '../../interfaces/options/IOptions';

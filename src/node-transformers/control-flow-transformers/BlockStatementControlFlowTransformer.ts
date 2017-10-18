@@ -4,7 +4,7 @@ import { ServiceIdentifiers } from '../../container/ServiceIdentifiers';
 import * as estraverse from 'estraverse';
 import * as ESTree from 'estree';
 
-import { TControlFlowCustomNodeFactory } from '../../types/container/custom-nodes/TControlFlowCustomNodeFactory';
+import { TControlFlowCustomNodeFactory } from '../../types/custom-nodes/TControlFlowCustomNodeFactory';
 
 import { IArrayUtils } from '../../interfaces/utils/IArrayUtils';
 import { ICustomNode } from '../../interfaces/custom-nodes/ICustomNode';

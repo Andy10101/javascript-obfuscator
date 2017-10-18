@@ -4,7 +4,7 @@ import { ServiceIdentifiers } from '../container/ServiceIdentifiers';
 import * as estraverse from 'estraverse';
 import * as ESTree from 'estree';
 
-import { TNodeTransformerFactory } from '../types/container/node-transformers/TNodeTransformerFactory';
+import { TNodeTransformerFactory } from '../types/node-transformers/TNodeTransformerFactory';
 import { TVisitorDirection } from '../types/node-transformers/TVisitorDirection';
 import { TVisitorFunction } from '../types/node-transformers/TVisitorFunction';
 import { TVisitorResult } from '../types/node-transformers/TVisitorResult';

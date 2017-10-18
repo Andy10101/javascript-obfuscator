@@ -14,7 +14,7 @@ export class NodeUtils {
     /**
      * @type {string[]}
      */
-    private static readonly nodesWithBlockScope: string[] = [
+    public static readonly nodesWithBlockScope: string[] = [
         NodeType.ArrowFunctionExpression,
         NodeType.FunctionDeclaration,
         NodeType.FunctionExpression,

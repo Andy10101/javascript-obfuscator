@@ -1,7 +1,7 @@
 import { injectable, inject, postConstruct } from 'inversify';
 import { ServiceIdentifiers } from '../../container/ServiceIdentifiers';
 
-import { TCustomNodeGroupFactory } from '../../types/container/custom-nodes/TCustomNodeGroupFactory';
+import { TCustomNodeGroupFactory } from '../../types/custom-nodes/TCustomNodeGroupFactory';
 
 import { ICustomNodeGroup } from '../../interfaces/custom-nodes/ICustomNodeGroup';
 import { IRandomGenerator } from '../../interfaces/utils/IRandomGenerator';

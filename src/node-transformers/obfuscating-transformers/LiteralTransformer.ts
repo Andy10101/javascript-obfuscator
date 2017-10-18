@@ -3,7 +3,7 @@ import { ServiceIdentifiers } from '../../container/ServiceIdentifiers';
 
 import * as ESTree from 'estree';
 
-import { TLiteralObfuscatingReplacerFactory } from '../../types/container/node-transformers/TLiteralObfuscatingReplacerFactory';
+import { TLiteralObfuscatingReplacerFactory } from '../../types/node-transformers/TLiteralObfuscatingReplacerFactory';
 
 import { IOptions } from '../../interfaces/options/IOptions';
 import { IRandomGenerator } from '../../interfaces/utils/IRandomGenerator';
@@ -63,15 +63,15 @@ export class LiteralTransformer extends AbstractNodeTransformer {
         switch (typeof literalNode.value) {
             case 'boolean':
                 return this.literalObfuscatingReplacerFactory(LiteralObfuscatingReplacer.BooleanLiteralObfuscatingReplacer)
-                    .replace(<boolean>literalNode.value);
+                    .replace(literalNode);
 
             case 'number':
                 return this.literalObfuscatingReplacerFactory(LiteralObfuscatingReplacer.NumberLiteralObfuscatingReplacer)
-                    .replace(<number>literalNode.value);
+                    .replace(literalNode);
 
             case 'string':
                 return this.literalObfuscatingReplacerFactory(LiteralObfuscatingReplacer.StringLiteralObfuscatingReplacer)
-                    .replace(<string>literalNode.value);
+                    .replace(literalNode);
 
             default:
                 return literalNode;

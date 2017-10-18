@@ -26,24 +26,26 @@ export class NumberLiteralObfuscatingReplacer extends AbstractObfuscatingReplace
     }
 
     /**
-     * @param {number} nodeValue
+     * @param {Literal} node
      * @returns {Node}
      */
-    public replace (nodeValue: number): ESTree.Node {
+    public replace (node: ESTree.Literal): ESTree.Node {
+        const literalValue: number = <number>node.value;
+
         let rawValue: string;
 
-        if (this.numberLiteralCache.has(nodeValue)) {
-            rawValue = <string>this.numberLiteralCache.get(nodeValue);
+        if (this.numberLiteralCache.has(literalValue)) {
+            rawValue = <string>this.numberLiteralCache.get(literalValue);
         } else {
-            if (!Utils.isCeilNumber(nodeValue)) {
-                rawValue = String(nodeValue);
+            if (!Utils.isCeilNumber(literalValue)) {
+                rawValue = String(literalValue);
             } else {
-                rawValue = `${Utils.hexadecimalPrefix}${Utils.decToHex(nodeValue)}`;
+                rawValue = `${Utils.hexadecimalPrefix}${Utils.decToHex(literalValue)}`;
             }
 
-            this.numberLiteralCache.set(nodeValue, rawValue);
+            this.numberLiteralCache.set(literalValue, rawValue);
         }
 
-        return Nodes.getLiteralNode(nodeValue, rawValue);
+        return Nodes.getLiteralNode(literalValue, rawValue);
     }
 }

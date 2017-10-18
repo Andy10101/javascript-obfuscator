@@ -40,11 +40,13 @@ export class BooleanLiteralObfuscatingReplacer extends AbstractObfuscatingReplac
     }
 
     /**
-     * @param {boolean} nodeValue
+     * @param {Literal} node
      * @returns {Node}
      */
-    public replace (nodeValue: boolean): ESTree.Node {
-        return nodeValue
+    public replace (node: ESTree.Literal): ESTree.Node {
+        const literalValue: boolean = <boolean>node.value;
+
+        return literalValue
             ? BooleanLiteralObfuscatingReplacer.getTrueUnaryExpressionNode()
             : BooleanLiteralObfuscatingReplacer.getFalseUnaryExpressionNode();
     }

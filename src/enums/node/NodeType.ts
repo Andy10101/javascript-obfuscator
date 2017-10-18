@@ -1,5 +1,6 @@
 export enum NodeType {
     ArrayExpression = 'ArrayExpression',
+    ArrayPattern = 'ArrayPattern',
     ArrowFunctionExpression = 'ArrowFunctionExpression',
     AssignmentExpression = 'AssignmentExpression',
     AssignmentPattern = 'AssignmentPattern',
@@ -24,6 +25,7 @@ export enum NodeType {
     ObjectPattern = 'ObjectPattern',
     Program = 'Program',
     Property = 'Property',
+    RestElement = 'RestElement',
     ReturnStatement = 'ReturnStatement',
     SwitchCase = 'SwitchCase',
     SwitchStatement = 'SwitchStatement',
